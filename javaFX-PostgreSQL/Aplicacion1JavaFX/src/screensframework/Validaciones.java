@@ -11,25 +11,20 @@ public class Validaciones {
     
     public Validaciones () {}
     
-    
     /******* VALIDAR VACIOS ************/
     public boolean validarVacios(String datos, String nombreCampo) {
-        
-        if (datos.equals("")) {
-            
-            JOptionPane.showMessageDialog(null, "El campo "+nombreCampo+" no puede estar vacio");
+        if (datos.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "El campo " + nombreCampo + " no puede estar vacío");
             return false;
         }
-        
         return true;
     }
     
     /********* VALIDAR LONGITUD ****************/
     public boolean validarMaximo(String datos, String nombreCampo, int maximo, int minimo) {
-       
         if (!datos.isEmpty()) {
             if (datos.length() > maximo || datos.length() < minimo) {
-                JOptionPane.showMessageDialog(null, "Debe ser entre "+minimo+" y "+maximo+" caracteres para "+nombreCampo);
+                JOptionPane.showMessageDialog(null, "Debe ser entre " + minimo + " y " + maximo + " caracteres para " + nombreCampo);
                 return false;
             }
         }
@@ -38,13 +33,12 @@ public class Validaciones {
     
     /******* VALIDAR CORREO ************/
     public boolean validarCorreo(String datos) {
-        
-        p = Pattern.compile("^[a-zA-Z0-9._%+-]+@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,4}$");
+        p = Pattern.compile("^[a-zA-Z0-9._%+-]+@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,}$");
         m = p.matcher(datos);
         
         if (!datos.isEmpty()) {
-            if (!m.find()) {
-                JOptionPane.showMessageDialog(null, "La direccion de correo es correcta");
+            if (!m.matches()) {  // Cambié find() por matches()
+                JOptionPane.showMessageDialog(null, "La dirección de correo es incorrecta");
                 return false;
             }
         }
@@ -53,11 +47,11 @@ public class Validaciones {
     
     /****** SOLO LETRAS *********/
     public boolean soloLetras(String datos) {
-        
-        p = Pattern.compile("^[a-zA-Z]*$");
+        p = Pattern.compile("^[a-zA-ZñÑáéíóúÁÉÍÓÚ]+$"); // Se corrigió para no aceptar vacío
         m = p.matcher(datos); 
+        
         if (!datos.isEmpty()) {
-            if (!m.find()) {
+            if (!m.matches()) {
                 JOptionPane.showMessageDialog(null, "Solo se admiten letras");
                 return false;
             }
@@ -65,14 +59,14 @@ public class Validaciones {
         return true;
     }
     
-    /****** SOLO NUMEROS *********/
+    /****** SOLO NÚMEROS *********/
     public boolean soloNumeros(String datos) {
-        
-        p = Pattern.compile("^[0-9A-Z]*$");
+        p = Pattern.compile("^[0-9]+$"); // Se corrigió para aceptar solo números
         m = p.matcher(datos); 
+        
         if (!datos.isEmpty()) {
-            if (!m.find()) {
-                JOptionPane.showMessageDialog(null, "Solo se admiten numeros");
+            if (!m.matches()) {
+                JOptionPane.showMessageDialog(null, "Solo se admiten números");
                 return false;
             }
         }
@@ -81,12 +75,10 @@ public class Validaciones {
     
     /****** PASSWORD *********/
     public boolean validaPassword(String pass1, String pass2) {
-        
-        if (pass1 == null ? pass2 != null : !pass1.equals(pass2)) {
+        if (!pass1.equals(pass2)) { // Se simplificó la comparación
             JOptionPane.showMessageDialog(null, "Las contraseñas deben ser iguales");
             return false;
         }
         return true;
     }
-    
 }
