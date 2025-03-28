@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package screensframework;
 
 import java.net.URL;
@@ -10,7 +6,7 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javax.swing.JOptionPane;
+import javafx.scene.control.Alert;
 
 /**
  * FXML Controller class
@@ -19,36 +15,47 @@ import javax.swing.JOptionPane;
  */
 public class ContenidoController implements Initializable, ControlledScreen {
     
-    ScreensController controlador;
+    private ScreensController controlador;
+    private final ControlesBasicos controlesBasicos = new ControlesBasicos();
     
-    private ControlesBasicos controlesBasicos = new ControlesBasicos();
-    
-    /**
-     * Initializes the controller class.
-     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
+        // Código de inicialización si es necesario
     }    
 
     @Override
     public void setScreenParent(ScreensController pantallaPadre) {
-        controlador = pantallaPadre; 
+        this.controlador = pantallaPadre; 
     }
     
     @FXML
-    private void irMantenimientoProducto(ActionEvent  event) {
-       
-       controlador.setScreen(ScreensFramework.mantenimientoProductoID);
+    private void irMantenimientoProducto(ActionEvent event) {
+        if (controlador != null) {
+            controlador.setScreen(ScreensFramework.mantenimientoProductoID);
+        } else {
+            mostrarAlerta("Error", "No se pudo cambiar de pantalla.");
+        }
     }
     
     @FXML
     private void salir(ActionEvent event) {
-        this.controlesBasicos.salirSistema();
+        Platform.exit();
     }
     
     @FXML
     private void cerrarSesion(ActionEvent event) {
-        controlador.setScreen(ScreensFramework.loginID);
+        if (controlador != null) {
+            controlador.setScreen(ScreensFramework.loginID);
+        } else {
+            mostrarAlerta("Error", "No se pudo cerrar sesión.");
+        }
+    }
+
+    private void mostrarAlerta(String titulo, String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
     }
 }
