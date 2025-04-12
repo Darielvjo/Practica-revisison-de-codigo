@@ -22,7 +22,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 /**
  * FXML Controller class
  *
- * @author Wil
+ * @author Will
  */
 public class LoginController implements Initializable, ControlledScreen {
     ScreensController controlador;

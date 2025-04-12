@@ -28,7 +28,7 @@ import screensframework.DBConnect.DBConnection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javafx.scene.control.Label;
-
+import java.sql.PreparedStatement;
 public class ProductoController implements Initializable, ControlledScreen {
     
     ScreensController controlador;
@@ -328,78 +328,75 @@ public class ProductoController implements Initializable, ControlledScreen {
     }
     
     @FXML
-private void eliminarProducto(ActionEvent event) {
-    int confirmarEliminar = JOptionPane.showConfirmDialog(null, "Realmente desea eliminar este producto??");
+    private void eliminarProducto(ActionEvent event) {
+        
+        int confirmarEliminar = JOptionPane.showConfirmDialog(null, "Realmente desea eliminar este producto??");
+        
+        if (confirmarEliminar == 0) {
+            try {
+                conexion = DBConnection.connect();
 
-    if (confirmarEliminar == 0) {
-        try {
-            conexion = DBConnection.connect();
+                String sql = "DELETE FROM producto WHERE idproducto = "+lbCodigoProducto.getText()+"";
 
-            String sql = "DELETE FROM producto WHERE idproducto = ?";
-            PreparedStatement estado = conexion.prepareStatement(sql);
-            estado.setInt(1, Integer.parseInt(lbCodigoProducto.getText()));
+                PreparedStatement estado = conexion.prepareStatement(sql);
 
-            int n = estado.executeUpdate(); // Se guarda el número de filas afectadas
+        int n =  estado.executeUpdate();
 
-            if (n > 0) {
-                tablaProducto.getColumns().clear();
-                tablaProducto.getItems().clear();
-                cargarDatosTabla();
+                if (n > 0) {
+                    tablaProducto.getColumns().clear();
+                    tablaProducto.getItems().clear();
+                    cargarDatosTabla();
+                }
+
+                estado.close();
+
+            } catch (SQLException e) {
+                System.out.println("Error " + e);
             }
-
-            estado.close();
-            conexion.close();
-
-        } catch (SQLException e) {
-            System.out.println("Error " + e);
-        } catch (NumberFormatException e) {
-            System.out.println("Error: ID de producto no válido. " + e);
         }
     }
-}
 
-    
     @FXML
     private void buscarProducto(ActionEvent event) {
-        
+
         tablaProducto.getItems().clear();
         try {
             conexion = DBConnection.connect();
-             String sql = "SELECT p.idproducto, "
+
+            String sql = "SELECT p.idproducto, "
                     + " p.nombre_producto, "
                     + " p.precio, "
                     + " c.nombre_categoria AS nom_categoria, "
                     + " m.nombre_marca AS nom_marca "
-                    + " FROM producto AS p, categoria AS c, marca AS m "
-                    + " WHERE CONCAT "
-                    + " (p.idproducto, '', "
-                    + " p.nombre_producto, '', "
-                    + " p.precio, '', "
-                    + " c.nombre_categoria, '',"
-                    + " m.nombre_marca) LIKE '%"+tfBuscarProducto.getText()+"%' AND "
-                    + " p.idcategoria = c.idcategoria AND "
-                    + " p.idmarca = m.idmarca ORDER BY p.idproducto DESC";
-            
+                    + " FROM producto AS p "
+                    + " JOIN categoria AS c ON p.idcategoria = c.idcategoria "
+                    + " JOIN marca AS m ON p.idmarca = m.idmarca "
+                    + " WHERE p.idproducto::TEXT LIKE '%" + tfBuscarProducto.getText() + "%' "
+                    + " OR p.nombre_producto LIKE '%" + tfBuscarProducto.getText() + "%' "
+                    + " OR p.precio::TEXT LIKE '%" + tfBuscarProducto.getText() + "%' "
+                    + " OR c.nombre_categoria LIKE '%" + tfBuscarProducto.getText() + "%' "
+                    + " OR m.nombre_marca LIKE '%" + tfBuscarProducto.getText() + "%' "
+                    + " ORDER BY p.idproducto DESC";
+
             ResultSet rs = conexion.createStatement().executeQuery(sql);
-            
-            while(rs.next()){
-                
+
+            while (rs.next()) {
                 ObservableList<String> row = FXCollections.observableArrayList();
-                for(int i = 1 ; i <= rs.getMetaData().getColumnCount(); i++){
-                   
+                for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
                     row.add(rs.getString(i));
                 }
                 producto.addAll(row);
             }
+
             tablaProducto.setItems(producto);
             rs.close();
-            
+
         } catch (SQLException e) {
             System.out.println("Error " + e.getMessage());
         }
-        
     }
-    
+
+
     @FXML
     private void nuevoProducto(ActionEvent event) {
         
